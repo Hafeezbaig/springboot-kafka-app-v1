@@ -34,7 +34,6 @@ build/
 
 # Ignore IDE settings and build output
 .idea/
-target/
 
 # Environment variables
 .env
