@@ -7,10 +7,11 @@ This is a simple Kafka-based application using Spring Boot that allows sending a
 ## Features
 
 - Kafka setup using Bitnami Kafka Docker image (no Zookeeper, KRaft mode)
-- Spring Boot Kafka producer and consumer setup
-- REST endpoint to produce messages
+- Spring Boot Kafka producer and consumer
+- REST API endpoint to produce messages
 - Kafka listener to consume messages
-- Swagger/OpenAPI support
+- Swagger/OpenAPI documentation
+- Postman collection available for quick API testing
 
 ---
 
@@ -34,28 +35,47 @@ src/
 ├── producer/KafkaProducerService.java
 ├── consumer/KafkaConsumerService.java
 └── resources/application.properties
+
+docker/
+└── docker-compose.yml
+
+root/
+└── kafka-postman-collection.json
 ```
 
 ---
 
-## Step 1: Run Kafka in Docker (KRaft mode)
+## Step 1: Start Kafka with Docker Compose (KRaft Mode)
+
+From the project root, run:
 
 ```bash
-docker run -d --rm --name kafka-container \
-  -p 9092:9092 \
-  -e KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv \
-  -e KAFKA_CFG_NODE_ID=1 \
-  -e KAFKA_CFG_PROCESS_ROLES=broker,controller \
-  -e KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093 \
-  -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
-  -e KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER \
-  -e KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
-  bitnami/kafka:latest
+docker-compose -f docker/docker-compose.yml up -d
+```
+
+To stop Kafka:
+
+```bash
+docker-compose -f docker/docker-compose.yml down
+```
+
+To view logs:
+
+```bash
+docker-compose -f docker/docker-compose.yml logs -f
+```
+
+To enter the Kafka container:
+
+```bash
+docker exec -it kafka-container bash
 ```
 
 ---
 
-## Step 2: Create Kafka Topic (Optional if auto-created)
+## Step 2: Optional – Create Kafka Topic Manually
+
+Kafka topics are auto-created, but if needed:
 
 ```bash
 docker exec -it kafka-container bash
@@ -65,21 +85,33 @@ kafka-topics.sh --bootstrap-server localhost:9092 \
   --partitions 1 --replication-factor 1
 ```
 
-If the topic already exists, it will throw an error which can be ignored.
+If the topic already exists, the error can be ignored.
 
 ---
 
 ## Step 3: Run the Spring Boot Application
 
+Make sure port 9200 is free:
+
+```bash
+lsof -i :9200
+```
+
+If it is in use, kill the process:
+
+```bash
+kill -9 <pid>
+```
+
+Then run the app:
+
 ```bash
 mvn spring-boot:run
 ```
 
-Make sure port 9200 is free. If it's occupied, you can change the port in `application.properties`.
-
 ---
 
-## Step 4: Send a Message Using cURL
+## Step 4: Send a Message (via cURL)
 
 ```bash
 curl -X POST http://localhost:9200/api/produce \
@@ -89,17 +121,21 @@ curl -X POST http://localhost:9200/api/produce \
 
 ---
 
-## Output Verification
+## Step 5: Send a Message (via Postman)
+
+You can import the `kafka-postman-collection.json` file from the project root directory into Postman and send test messages using the `POST /api/produce` request.
+
+---
+
+## Output
 
 - In Producer logs:
-
   ```
   Producing message to Kafka: Kafka is awesome!
   Message sent to topic: message-topic
   ```
 
 - In Consumer logs:
-
   ```
   Received message from Kafka: Kafka is awesome!
   ```
@@ -115,9 +151,9 @@ app.topic.name=message-topic
 
 ---
 
-## API Documentation
+## Swagger UI
 
-You can view and test the API through Swagger UI:
+API documentation is available at:
 
 ```
 http://localhost:9200/swagger-ui/index.html
@@ -125,19 +161,9 @@ http://localhost:9200/swagger-ui/index.html
 
 ---
 
-## Cleaning Up
-
-To stop Kafka:
-
-```bash
-docker stop kafka-container
-```
-
----
-
 ## Status
 
-The Kafka integration is complete and working. Messages can be sent via REST and consumed by the Spring Boot application.
+The Kafka integration is complete and functional. Messages can be sent via REST and are successfully consumed by the Spring Boot application. The project is ready for the next enhancement steps as per review instructions.
 
 ---
 
