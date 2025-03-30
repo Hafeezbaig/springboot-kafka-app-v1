@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,22 +30,29 @@ public class MessageController {
                     responseCode = "202",
                     description = "Message accepted for delivery",
                     content = @Content(schema = @Schema(implementation = Map.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input",
+                    content = @Content
             )
     })
     @PostMapping("/produce")
-    public ResponseEntity<?> sendMessage(
+    public ResponseEntity<Map<String, Object>> sendMessage(
             @RequestBody(
                     description = "Message payload",
                     required = true,
                     content = @Content(schema = @Schema(implementation = MessageRequest.class))
             )
-            @org.springframework.web.bind.annotation.RequestBody MessageRequest request
+            @Valid @org.springframework.web.bind.annotation.RequestBody MessageRequest request
     ) {
         kafkaProducer.sendMessage(request.message());
 
-        return ResponseEntity.accepted().body(Map.of(
-                "statusCode", 202,
-                "info", "Message sent to Kafka successfully"
-        ));
+        return ResponseEntity
+                .accepted()
+                .body(Map.of(
+                        "statusCode", 202,
+                        "info", "Message sent to Kafka successfully"
+                ));
     }
 }
