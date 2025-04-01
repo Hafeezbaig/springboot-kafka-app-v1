@@ -35,10 +35,10 @@ public class KafkaProducerService {
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
-                log.error("❌ Failed to send message [{}] to topic [{}]", message, topicName, ex);
+                log.error("Failed to send message [{}] to topic [{}]", message, topicName, ex);
             } else {
                 RecordMetadata metadata = result.getRecordMetadata();
-                log.info("✅ Message [{}] sent successfully to topic [{}], partition [{}], offset [{}]",
+                log.info("Message [{}] sent successfully to topic [{}], partition [{}], offset [{}]",
                         message, topicName, metadata.partition(), metadata.offset());
             }
         });

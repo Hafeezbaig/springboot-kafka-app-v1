@@ -13,6 +13,6 @@ public class KafkaConsumerService {
 
     @KafkaListener(topics = "message-topic", groupId = "in28-group")
     public void listen(ConsumerRecord<String, String> record) {
-        log.info("📥 Received message from Kafka: {}", record.value());
+        log.info("Received message from Kafka: {}", record.value());
     }
 }

@@ -6,7 +6,7 @@ This is a simple Kafka-based application using Spring Boot that allows sending a
 
 ## Features
 
-- Kafka setup using Bitnami Kafka Docker image (no Zookeeper, KRaft mode)
+- Kafka setup using Bitnami Kafka Docker image (no ZooKeeper, KRaft mode)
 - Spring Boot Kafka producer and consumer
 - REST API endpoint to produce messages
 - Kafka listener to consume messages
@@ -75,7 +75,7 @@ docker exec -it kafka-container bash
 
 ## Step 2: Optional – Create Kafka Topic Manually
 
-Kafka topics are auto-created, but if needed:
+Kafka topics are auto-created if `KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true`. If needed, manually create:
 
 ```bash
 docker exec -it kafka-container bash
@@ -91,13 +91,13 @@ If the topic already exists, the error can be ignored.
 
 ## Step 3: Run the Spring Boot Application
 
-Make sure port 9200 is free:
+Check if port 9200 is free:
 
 ```bash
 lsof -i :9200
 ```
 
-If it is in use, kill the process:
+If it is occupied, kill the process:
 
 ```bash
 kill -9 <pid>
@@ -123,37 +123,44 @@ curl -X POST http://localhost:9200/api/produce \
 
 ## Step 5: Send a Message (via Postman)
 
-You can import the `kafka-postman-collection.json` file from the project root directory into Postman and send test messages using the `POST /api/produce` request.
+You can import the `kafka-postman-collection.json` file from the project root into Postman.
+
+Send a `POST` request to:
+
+```
+http://localhost:9200/api/produce
+```
+
+Body (JSON):
+
+```json
+{
+  "message": "Kafka is awesome!"
+}
+```
 
 ---
 
-## Output
+## Output Logs
 
-- In Producer logs:
-  ```
-  Producing message to Kafka: Kafka is awesome!
-  Message sent to topic: message-topic
-  ```
+**Producer logs:**
 
-- In Consumer logs:
-  ```
-  Received message from Kafka: Kafka is awesome!
-  ```
+```
+Producing message to Kafka: Kafka is awesome!
+Message sent to topic: message-topic
+```
 
----
+**Consumer logs:**
 
-## application.properties
-
-```properties
-spring.kafka.bootstrap-servers=localhost:9092
-app.topic.name=message-topic
+```
+Received message from Kafka: Kafka is awesome!
 ```
 
 ---
 
 ## Swagger UI
 
-API documentation is available at:
+You can access the API documentation at:
 
 ```
 http://localhost:9200/swagger-ui/index.html
@@ -163,7 +170,10 @@ http://localhost:9200/swagger-ui/index.html
 
 ## Status
 
-The Kafka integration is complete and functional. Messages can be sent via REST and are successfully consumed by the Spring Boot application. The project is ready for the next enhancement steps as per review instructions.
+Kafka is running in KRaft mode via Docker Compose.  
+Spring Boot successfully produces and consumes messages using Kafka.  
+Postman and Swagger are integrated for easy testing.  
+The project is ready for review and the next enhancement steps.
 
 ---
 
