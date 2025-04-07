@@ -1,7 +1,6 @@
 package com.in28minutes.producer;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Service responsible for producing messages to a Kafka topic.
- */
 @Service
 public class KafkaProducerService {
 
@@ -24,34 +20,40 @@ public class KafkaProducerService {
     @Value("${app.topic.name}")
     private String topicName;
 
-    /**
-     * Constructor to inject KafkaTemplate.
-     *
-     * @param kafkaTemplate KafkaTemplate to publish messages
-     */
     public KafkaProducerService(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     /**
-     * Sends a message to the configured Kafka topic.
-     * Uses CompletableFuture to handle asynchronous response and logs success/failure.
-     *
-     * @param message The message content to send
+     * Sends a message to Kafka using a key to control partitioning.
+     * @param message The message payload to send
      */
     public void sendMessage(String message) {
         log.info("Producing message to Kafka topic [{}]: {}", topicName, message);
 
-        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topicName, message);
+        // Use key-based logic to determine partition
+        String key = generateKey(message);  // e.g., first word as key
+
+        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topicName, key, message);
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
-                log.error("Failed to send message [{}] to topic [{}]", message, topicName, ex);
+                log.error("Failed to send message [{}] with key [{}] to topic [{}]", message, key, topicName, ex);
             } else {
                 RecordMetadata metadata = result.getRecordMetadata();
-                log.info("Message [{}] sent successfully to topic [{}], partition [{}], offset [{}]",
-                        message, topicName, metadata.partition(), metadata.offset());
+                log.info("Message [{}] with key [{}] sent successfully to topic [{}], partition [{}], offset [{}]",
+                        message, key, topicName, metadata.partition(), metadata.offset());
             }
         });
+    }
+
+    /**
+     * Generates a key based on message content for partitioning logic.
+     * @param message The message payload
+     * @return A derived key for Kafka partitioning
+     */
+    private String generateKey(String message) {
+        if (message == null || message.isBlank()) return "default";
+        return message.split(" ")[0].toLowerCase();  // Simple logic: take first word as key
     }
 }
