@@ -11,6 +11,7 @@ This is a simple Kafka-based application using Spring Boot that allows sending a
 - REST API endpoint to produce messages
 - Kafka listener to consume messages
 - Swagger/OpenAPI documentation
+- Kafka UI to monitor topics and messages
 - Postman collection available for quick API testing
 
 ---
@@ -38,6 +39,10 @@ src/
 
 docker/
 └── docker-compose.yml
+
+docs/
+├── swagger-ui-screenshot.png
+└── kafka-ui-screenshot.png
 
 root/
 └── kafka-postman-collection.json
@@ -166,6 +171,24 @@ You can access the API documentation at:
 http://localhost:9200/swagger-ui/index.html
 ```
 
+**Screenshot:**
+
+![Swagger UI](docs/swagger-ui-screenshot.png)
+
+---
+
+## Kafka UI
+
+Kafka UI dashboard is accessible at:
+
+```
+http://localhost:8080/
+```
+
+**Screenshot:**
+
+![Kafka UI](docs/kafka-ui-screenshot.png)
+
 ---
 
 ## Status
@@ -173,7 +196,8 @@ http://localhost:9200/swagger-ui/index.html
 Kafka is running in KRaft mode via Docker Compose.  
 Spring Boot successfully produces and consumes messages using Kafka.  
 Postman and Swagger are integrated for easy testing.  
-The project is ready for review and the next enhancement steps.
+Kafka UI helps visualize topics and messages in real time.  
+The project is ready for further enhancements as per review.
 
 ---
 
