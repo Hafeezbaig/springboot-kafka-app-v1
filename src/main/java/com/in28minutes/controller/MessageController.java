@@ -24,6 +24,12 @@ public class MessageController {
         this.kafkaProducer = kafkaProducer;
     }
 
+    /**
+     * REST endpoint to send a message to Kafka topic.
+     *
+     * @param request MessageRequest payload containing the message string
+     * @return HTTP 202 Accepted response with success info
+     */
     @Operation(summary = "Send a message to Kafka topic")
     @ApiResponses(value = {
             @ApiResponse(
