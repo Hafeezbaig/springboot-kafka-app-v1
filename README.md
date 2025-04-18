@@ -52,10 +52,18 @@ root/
 
 ## Step 1: Start Kafka with Docker Compose (KRaft Mode)
 
-From the project root, run:
+From the project root, run the appropriate command based on your Docker version:
+
+For Docker versions **below 20**:
 
 ```bash
 docker-compose -f docker/docker-compose.yml up -d
+```
+
+For Docker versions 20 and above (uses new syntax):
+
+```
+docker compose -f docker/docker-compose.yml up -d
 ```
 
 To stop Kafka:
@@ -171,6 +179,24 @@ You can access the API documentation at:
 http://localhost:9200/swagger-ui/index.html
 ```
 
+
+This Swagger page includes:
+
+- **POST /api/produce**  
+  - **Request Body Example:**
+    ```json
+    {
+      "message": "Kafka is awesome!"
+    }
+    ```
+  - **Expected Response:**
+    ```json
+    {
+      "statusCode": 201,
+      "info": "Message sent to Kafka successfully"
+    }
+    ```
+
 **Screenshot:**
 
 ![Swagger UI](docs/swagger-ui-screenshot.png)
@@ -191,13 +217,34 @@ http://localhost:8080/
 
 ---
 
+## About KRaft (Kafka Raft Metadata Mode)
+
+KRaft (Kafka Raft Metadata mode) is a newer architecture introduced in Apache Kafka to eliminate the need for ZooKeeper. It offers a simplified and more scalable way to manage metadata within the Kafka cluster.
+
+### Key Benefits of KRaft
+
+- No ZooKeeper dependency
+- Built-in Raft consensus for metadata consistency
+- Simpler deployment and management
+- Better support for scaling controllers
+
+### KRaft vs ZooKeeper Architecture
+
+The following diagram compares the traditional ZooKeeper-based Kafka setup with the newer KRaft-based setup:
+
+![KRaft Architecture](docs/kraft-architecture.jpg)
+
+> Source: [Confluent Developer – Learn KRaft](https://developer.confluent.io/learn/kraft/)
+
+
 ## Status
 
-Kafka is running in KRaft mode via Docker Compose.  
-Spring Boot successfully produces and consumes messages using Kafka.  
-Postman and Swagger are integrated for easy testing.  
-Kafka UI helps visualize topics and messages in real time.  
-The project is ready for further enhancements as per review.
+- Kafka is running in KRaft mode via Docker Compose. 
+- Spring Boot successfully produces and consumes messages using Kafka.
+- Postman and Swagger are integrated for easy testing and API documentation.
+- Kafka UI helps visualize topics and messages in real time.
+- All review comments from both Yatin and Mahi Sir have been incorporated.
+- The project is now finalized and ready for next enhancements.
 
 ---
 

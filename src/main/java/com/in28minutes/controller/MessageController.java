@@ -1,11 +1,11 @@
 package com.in28minutes.controller;
 
+import org.springframework.web.bind.annotation.RequestBody;
 import com.in28minutes.dto.MessageRequest;
 import com.in28minutes.producer.KafkaProducerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -28,12 +28,12 @@ public class MessageController {
      * REST endpoint to send a message to Kafka topic.
      *
      * @param request MessageRequest payload containing the message string
-     * @return HTTP 202 Accepted response with success info
+     * @return HTTP 201 Created response with success info
      */
     @Operation(summary = "Send a message to Kafka topic")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "202",
+                    responseCode = "201",
                     description = "Message accepted for delivery",
                     content = @Content(schema = @Schema(implementation = Map.class))
             ),
@@ -45,19 +45,20 @@ public class MessageController {
     })
     @PostMapping("/produce")
     public ResponseEntity<Map<String, Object>> sendMessage(
-            @RequestBody(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Message payload",
                     required = true,
                     content = @Content(schema = @Schema(implementation = MessageRequest.class))
             )
-            @Valid @org.springframework.web.bind.annotation.RequestBody MessageRequest request
+            @Valid @RequestBody MessageRequest request
+
     ) {
         kafkaProducer.sendMessage(request.message());
 
         return ResponseEntity
-                .accepted()
+                .status(201)
                 .body(Map.of(
-                        "statusCode", 202,
+                        "statusCode", 201,
                         "info", "Message sent to Kafka successfully"
                 ));
     }

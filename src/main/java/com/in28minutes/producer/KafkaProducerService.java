@@ -48,7 +48,7 @@ public class KafkaProducerService {
             if (ex != null) {
                 log.error("Failed to send message [{}] to topic [{}]", message, topicName, ex);
             } else {
-                RecordMetadata metadata = result.getRecordMetadata();
+                var metadata = result.getRecordMetadata();
                 log.info("Message [{}] sent successfully to topic [{}], partition [{}], offset [{}]",
                         message, topicName, metadata.partition(), metadata.offset());
             }
