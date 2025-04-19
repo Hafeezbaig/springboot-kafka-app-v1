@@ -4,6 +4,27 @@ This is a simple Kafka-based application using Spring Boot that allows sending a
 
 ---
 
+## About KRaft (Kafka Raft Metadata Mode)
+
+KRaft (Kafka Raft Metadata mode) is a newer architecture introduced in Apache Kafka to eliminate the need for ZooKeeper. It offers a simplified and more scalable way to manage metadata within the Kafka cluster.
+
+### Key Benefits of KRaft
+
+- No ZooKeeper dependency
+- Built-in Raft consensus for metadata consistency
+- Simpler deployment and management
+- Better support for scaling controllers
+
+### KRaft vs ZooKeeper Architecture
+
+The following diagram compares the traditional ZooKeeper-based Kafka setup with the newer KRaft-based setup:
+
+![KRaft Architecture](docs/kraft-architecture.jpg)
+
+> Source: [Confluent Developer – Learn KRaft](https://developer.confluent.io/learn/kraft/)
+
+---
+
 ## Features
 
 - Kafka setup using Bitnami Kafka Docker image (no ZooKeeper, KRaft mode)
@@ -69,13 +90,13 @@ docker compose -f docker/docker-compose.yml up -d
 To stop Kafka:
 
 ```bash
-docker-compose -f docker/docker-compose.yml down
+docker compose -f docker/docker-compose.yml down
 ```
 
 To view logs:
 
 ```bash
-docker-compose -f docker/docker-compose.yml logs -f
+docker compose -f docker/docker-compose.yml logs -f
 ```
 
 To enter the Kafka container:
@@ -104,10 +125,10 @@ If the topic already exists, the error can be ignored.
 
 ## Step 3: Run the Spring Boot Application
 
-Check if port 9200 is free:
+Check if port 8080 is free:
 
 ```bash
-lsof -i :9200
+lsof -i :8080
 ```
 
 If it is occupied, kill the process:
@@ -127,7 +148,7 @@ mvn spring-boot:run
 ## Step 4: Send a Message (via cURL)
 
 ```bash
-curl -X POST http://localhost:9200/api/produce \
+curl -X POST http://localhost:8080/api/produce \
   -H "Content-Type: application/json" \
   -d '{"message": "Kafka is awesome!"}'
 ```
@@ -176,7 +197,7 @@ Received message from Kafka: Kafka is awesome!
 You can access the API documentation at:
 
 ```
-http://localhost:9200/swagger-ui/index.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
 
@@ -216,26 +237,6 @@ http://localhost:8080/
 ![Kafka UI](docs/kafka-ui-screenshot.png)
 
 ---
-
-## About KRaft (Kafka Raft Metadata Mode)
-
-KRaft (Kafka Raft Metadata mode) is a newer architecture introduced in Apache Kafka to eliminate the need for ZooKeeper. It offers a simplified and more scalable way to manage metadata within the Kafka cluster.
-
-### Key Benefits of KRaft
-
-- No ZooKeeper dependency
-- Built-in Raft consensus for metadata consistency
-- Simpler deployment and management
-- Better support for scaling controllers
-
-### KRaft vs ZooKeeper Architecture
-
-The following diagram compares the traditional ZooKeeper-based Kafka setup with the newer KRaft-based setup:
-
-![KRaft Architecture](docs/kraft-architecture.jpg)
-
-> Source: [Confluent Developer – Learn KRaft](https://developer.confluent.io/learn/kraft/)
-
 
 ## Status
 
