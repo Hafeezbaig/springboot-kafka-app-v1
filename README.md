@@ -1,6 +1,29 @@
 # Spring Boot Kafka Project (KRaft Mode)
 
+> This branch includes **Kafka Partitioning logic** in addition to the base setup from the main branch.
+
 This is a simple Kafka-based application using Spring Boot that allows sending and consuming messages via a REST API. It uses Apache Kafka running in KRaft (Kafka Raft metadata mode) using the Bitnami Docker image.
+
+---
+
+## About KRaft (Kafka Raft Metadata Mode)
+
+KRaft (Kafka Raft Metadata mode) is a newer architecture introduced in Apache Kafka to eliminate the need for ZooKeeper. It offers a simplified and more scalable way to manage metadata within the Kafka cluster.
+
+### Key Benefits of KRaft
+
+- No ZooKeeper dependency
+- Built-in Raft consensus for metadata consistency
+- Simpler deployment and management
+- Better support for scaling controllers
+
+### KRaft vs ZooKeeper Architecture
+
+The following diagram compares the traditional ZooKeeper-based Kafka setup with the newer KRaft-based setup:
+
+![KRaft Architecture](docs/kraft-architecture.jpg)
+
+> Source: [Confluent Developer – Learn KRaft](https://developer.confluent.io/learn/kraft/)
 
 ---
 
@@ -52,22 +75,30 @@ root/
 
 ## Step 1: Start Kafka with Docker Compose (KRaft Mode)
 
-From the project root, run:
+From the project root, run the appropriate command based on your Docker version:
+
+For Docker versions **below 20**:
 
 ```bash
 docker-compose -f docker/docker-compose.yml up -d
 ```
 
+For Docker versions 20 and above (uses new syntax):
+
+```
+docker compose -f docker/docker-compose.yml up -d
+```
+
 To stop Kafka:
 
 ```bash
-docker-compose -f docker/docker-compose.yml down
+docker compose -f docker/docker-compose.yml down
 ```
 
 To view logs:
 
 ```bash
-docker-compose -f docker/docker-compose.yml logs -f
+docker compose -f docker/docker-compose.yml logs -f
 ```
 
 To enter the Kafka container:
@@ -96,10 +127,10 @@ If the topic already exists, the error can be ignored.
 
 ## Step 3: Run the Spring Boot Application
 
-Check if port 9200 is free:
+Check if port 8080 is free:
 
 ```bash
-lsof -i :9200
+lsof -i :8080
 ```
 
 If it is occupied, kill the process:
@@ -119,7 +150,7 @@ mvn spring-boot:run
 ## Step 4: Send a Message (via cURL)
 
 ```bash
-curl -X POST http://localhost:9200/api/produce \
+curl -X POST http://localhost:8080/api/produce \
   -H "Content-Type: application/json" \
   -d '{"message": "Kafka is awesome!"}'
 ```
@@ -133,7 +164,7 @@ You can import the `kafka-postman-collection.json` file from the project root in
 Send a `POST` request to:
 
 ```
-http://localhost:9200/api/produce
+http://localhost:8080/api/produce
 ```
 
 Body (JSON):
@@ -168,8 +199,26 @@ Received message from Kafka: Kafka is awesome!
 You can access the API documentation at:
 
 ```
-http://localhost:9200/swagger-ui/index.html
+http://localhost:8080/swagger-ui/index.html
 ```
+
+
+This Swagger page includes:
+
+- **POST /api/produce**
+  - **Request Body Example:**
+    ```json
+    {
+      "message": "Kafka is awesome!"
+    }
+    ```
+  - **Expected Response:**
+    ```json
+    {
+      "statusCode": 201,
+      "info": "Message sent to Kafka successfully"
+    }
+    ```
 
 **Screenshot:**
 
@@ -193,11 +242,11 @@ http://localhost:8080/
 
 ## Status
 
-Kafka is running in KRaft mode via Docker Compose.  
-Spring Boot successfully produces and consumes messages using Kafka.  
-Postman and Swagger are integrated for easy testing.  
-Kafka UI helps visualize topics and messages in real time.  
-The project is ready for further enhancements as per review.
+- Kafka is running in KRaft mode via Docker Compose.
+- Spring Boot successfully produces and consumes messages using Kafka.
+- Postman and Swagger are integrated for easy testing and API documentation.
+- Kafka UI helps visualize topics and messages in real time.
+- All review comments from both Yatin and Mahi Sir have been incorporated.
+- The project is now finalized and ready for next enhancements.
 
 ---
-

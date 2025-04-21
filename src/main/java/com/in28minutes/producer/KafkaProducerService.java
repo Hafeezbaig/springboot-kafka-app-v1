@@ -25,8 +25,11 @@ public class KafkaProducerService {
     }
 
     /**
-     * Sends a message to Kafka using a key to control partitioning.
-     * @param message The message payload to send
+     * Sends a message to the configured Kafka topic with partitioning.
+     * Uses the message content to generate a key for partition selection.
+     * Logs metadata such as partition and offset after successful send.
+     *
+     * @param message The message content to send
      */
     public void sendMessage(String message) {
         log.info("Producing message to Kafka topic [{}]: {}", topicName, message);
@@ -40,7 +43,7 @@ public class KafkaProducerService {
             if (ex != null) {
                 log.error("Failed to send message [{}] with key [{}] to topic [{}]", message, key, topicName, ex);
             } else {
-                RecordMetadata metadata = result.getRecordMetadata();
+                var metadata = result.getRecordMetadata();
                 log.info("Message [{}] with key [{}] sent successfully to topic [{}], partition [{}], offset [{}]",
                         message, key, topicName, metadata.partition(), metadata.offset());
             }
